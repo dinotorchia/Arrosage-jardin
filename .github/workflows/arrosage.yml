@@ -1,0 +1,29 @@
+name: Agent arrosage
+
+# Déclenchement :
+#   - automatiquement chaque vendredi (cron en UTC)
+#   - manuellement via le bouton "Run workflow" (pour tester)
+on:
+  schedule:
+    # 18:00 UTC le vendredi = 20h00 (heure d'été) / 19h00 (heure d'hiver) à Bernay.
+    - cron: "0 18 * * 5"
+  workflow_dispatch: {}
+
+jobs:
+  arrosage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Lancer l'agent d'arrosage
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: python agent_arrosage.py
